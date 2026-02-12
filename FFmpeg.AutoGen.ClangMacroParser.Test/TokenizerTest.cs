@@ -35,16 +35,16 @@ namespace FFmpeg.AutoGen.ClangMacroParser.Test
         public void Char()
         {
             AssertAreEqual(Token(TokenType.Char, "a"), Tokenize(@"'a'").First());
-            //AssertAreEqual(Token(TokenType.Char, "\t"), Tokenize(@"'\t'").First()); // todo implement in tokenizer
-            //AssertAreEqual(Token(TokenType.Char, "\'"), Tokenize(@"'\''").First());
+            AssertAreEqual(Token(TokenType.Char, "\t"), Tokenize(@"'\t'").First());
+            AssertAreEqual(Token(TokenType.Char, "\'"), Tokenize(@"'\''").First());
         }
 
         [TestMethod]
         public void String()
         {
             AssertAreEqual(Token(TokenType.String, "abc"), Tokenize("\"abc\"").First());
-            //AssertAreEqual(Token(TokenType.String, "\t"), Tokenize("\"\t\"").First()); // todo implement in tokenizer
-            //AssertAreEqual(Token(TokenType.String, "\""), Tokenize("\"\"\"\"").First());
+            AssertAreEqual(Token(TokenType.String, "\t"), Tokenize("\"\t\"").First());
+            AssertAreEqual(Token(TokenType.String, "\""), Tokenize("\"\\\"\"\"").First());
         }
 
         [TestMethod]

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -67,20 +67,50 @@ namespace FFmpeg.AutoGen.ClangMacroParser.Tokenization
                 return Token(Keywords.Contains(value) ? TokenType.Keyword : TokenType.Identifier, value);
             }
 
+            char Unescape(char c) => c switch
+            {
+                'n' => '\n',
+                't' => '\t',
+                'r' => '\r',
+                '0' => '\0',
+                'a' => '\a',
+                'b' => '\b',
+                'f' => '\f',
+                'v' => '\v',
+                '\\' => '\\',
+                '\'' => '\'',
+                '"' => '"',
+                _ => c
+            };
+
+            IEnumerable<char> ReadEscaped(Func<char, bool> isTerminator)
+            {
+                while (CanRead() && !isTerminator(Current()))
+                {
+                    if (Current() == '\\' && i + 1 < characters.Length)
+                    {
+                        Read(); // consume backslash
+                        yield return Unescape(Read());
+                    }
+                    else
+                    {
+                        yield return Read();
+                    }
+                }
+            }
+
             Token String()
             {
-                //todo is not complete as escape double quote and double double quote needs to be handled
                 Skip(IsDoubleQuote);
-                var t = Token(TokenType.String, YieldWhile(x => !IsDoubleQuote(x)));
+                var t = Token(TokenType.String, ReadEscaped(IsDoubleQuote));
                 Skip(IsDoubleQuote);
                 return t;
             }
 
             Token Char()
             {
-                //todo is not complete as escape quote needs to be handled
                 Skip(IsQuote);
-                var t = Token(TokenType.Char, YieldWhile(x => !IsQuote(x)));
+                var t = Token(TokenType.Char, ReadEscaped(IsQuote));
                 Skip(IsQuote);
                 return t;
             }

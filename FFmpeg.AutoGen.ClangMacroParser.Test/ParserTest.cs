@@ -1,4 +1,4 @@
-﻿using FFmpeg.AutoGen.ClangMacroParser.Expressions;
+using FFmpeg.AutoGen.ClangMacroParser.Expressions;
 
 namespace FFmpeg.AutoGen.ClangMacroParser.Test
 {
@@ -110,7 +110,13 @@ namespace FFmpeg.AutoGen.ClangMacroParser.Test
         public void Enum()
         {
             var e = Parser.Parse("0x1UL << AVChannel.AV_CHAN_FRONT_LEFT");
-            // todo finalize test
+            CastExpression<BinaryExpression>(e,
+                x =>
+                {
+                    Assert.AreEqual(OperationType.LeftShift, x.OperationType);
+                    CastExpression<ConstantExpression>(x.Left, y => Assert.AreEqual((ulong)1, y.Value));
+                    CastExpression<VariableExpression>(x.Right, y => Assert.AreEqual("AVChannel.AV_CHAN_FRONT_LEFT", y.Name));
+                });
         }
     }
 }
